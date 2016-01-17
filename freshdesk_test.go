@@ -16,6 +16,7 @@ func TestTicket(t *testing.T) {
 	// 	Email:       "",
 	// 	Name:        "",
 	// 	Subject:     "this is a test",
+	// 	Type:        "Question",
 	// 	Description: "the content of the ticket would go here",
 	// 	Status:      Open,
 	// 	Priority:    Medium,

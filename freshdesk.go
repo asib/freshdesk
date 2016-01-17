@@ -107,6 +107,7 @@ type Ticket struct {
 	Name        string   `conform:"name" json:"name"`
 	Subject     string   `conform:"trim,title" json:"subject"`
 	Description string   `conform:"trim" json:"description"`
+	Type        string   `conform:"trim" json:"ticket_type"`
 	Status      status   `json:"status"`
 	Priority    priority `json:"priority"`
 	Source      source   `json:"source"`

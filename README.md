@@ -18,11 +18,12 @@ tk := &freshdesk.NewTicket{
   	Email:       "email@example.com",
   	Name:        "your name",
   	Subject:     "this is a test",
+    Type:        "Question",
   	Description: "the content of the ticket would go here",
   	Status:      freshdesk.Open,
   	Priority:    freshdesk.Medium,
   	Source:      freshdesk.Portal,
-  }
+  },
 }
 
 conform.Strings(tk.Ticket) // <-- optionally use "conform" library
