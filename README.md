@@ -11,7 +11,7 @@ import (
 	"os"
 
 	"github.com/leebenson/conform"
-	"github.com/smallpdf/conform"
+	"github.com/smallpdf/freshdesk"
 )
 
 func main() {
