@@ -15,10 +15,10 @@ func TestTicket(t *testing.T) {
 	}
 
 	ticket := &Ticket{
-		Email:       "",
-		Name:        "",
-		Subject:     "this is a test",
-		Type:        "Question",
+		Email:       "testuser@example.com",
+		Name:        "Cool Testuser",
+		Subject:     "this is a test feature request",
+		Type:        FeatureRequest,
 		Description: "the content of the ticket would go here",
 		Status:      Open,
 		Priority:    Medium,
