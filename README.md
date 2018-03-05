@@ -6,15 +6,21 @@ Basic API submitting a ticket to [Freshdesk.com](https://freshdesk.com)
 
 ```go
 
-import "github.com/fundedcity/freshdesk"
+import (
+	"fmt"
+	"os"
 
-r := &freshdesk.Request{
-	Domain: "your-freshdesk-domain",
-	API:    "api-key-here",
-}
+	"github.com/leebenson/conform"
+)
 
-tk := &freshdesk.NewTicket{
-  Ticket: &freshdesk.Ticket{
+func main() {
+	client, err := NewClient("your-domain", "your-api-key")
+	if err != nil {
+		fmt.Printf("Could not create client: %s\n", err)
+		os.Exit(1)
+	}
+
+	ticket := &Ticket{
   	Email:       "email@example.com",
   	Name:        "your name",
   	Subject:     "this is a test",
@@ -23,12 +29,16 @@ tk := &freshdesk.NewTicket{
   	Status:      freshdesk.Open,
   	Priority:    freshdesk.Medium,
   	Source:      freshdesk.Portal,
-  },
+	}
+
+	// optionally check the ticket with conform
+	conform.Strings(ticket)
+
+	if _, err := client.CreateTicket(ticket); err != nil {
+		fmt.Printf("failed to create ticket: %s", err)
+		os.Exit(1)
+	}
 }
-
-conform.Strings(tk.Ticket) // <-- optionally use "conform" library
-
-tk.Create(r) // <-- returns error || nil
 
 ```
 
