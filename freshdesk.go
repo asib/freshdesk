@@ -9,14 +9,19 @@ import (
 )
 
 type (
-	source   int
-	status   int
-	priority int
+	// Source of the ticket
+	Source int
+	// Status of the ticket
+	Status int
+	// Priority of the ticket
+	Priority int
+	// TicketType corresponds to the type of the ticket
+	TicketType string
 )
 
 const (
 	// Email ...
-	Email source = 1 + iota
+	Email Source = 1 + iota
 	// Portal ...
 	Portal
 	// Phone ...
@@ -33,7 +38,7 @@ const (
 
 const (
 	// Open ...
-	Open status = 2 + iota
+	Open Status = 2 + iota
 	// Pending ...
 	Pending
 	// Resolved ...
@@ -44,13 +49,26 @@ const (
 
 const (
 	// Low ...
-	Low priority = 1 + iota
+	Low Priority = 1 + iota
 	// Medium ...
 	Medium
 	// High ...
 	High
 	// Urgent ...
 	Urgent
+)
+
+const (
+	// Question ...
+	Question TicketType = "Question"
+	// Incident ...
+	Incident = "Incident"
+	// Problem ...
+	Problem = "Problem"
+	// FeatureRequest ...
+	FeatureRequest = "Feature Request"
+	// Lead ...
+	Lead = "Lead"
 )
 
 // Client is a freshdesk client that allows access to the freshdesk
@@ -60,6 +78,20 @@ type Client struct {
 	API    string
 
 	httpClient *http.Client
+}
+
+// Ticket represents a single helpdesk ticket
+type Ticket struct {
+	Email       string     `conform:"email" json:"email"`
+	Name        string     `conform:"name" json:"name"`
+	Subject     string     `conform:"trim,title" json:"subject"`
+	Description string     `conform:"trim" json:"description"`
+	Type        TicketType `conform:"trim" json:"type"`
+
+	Tags     []string `json:"tags,omitempty"`
+	Status   Status   `json:"status"`
+	Priority Priority `json:"priority"`
+	Source   Source   `json:"source"`
 }
 
 // NewClient returns a new freshdesk client.
@@ -100,16 +132,4 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 		return nil, err
 	}
 	return ret, nil
-}
-
-// Ticket represents a single helpdesk ticket
-type Ticket struct {
-	Email       string   `conform:"email" json:"email"`
-	Name        string   `conform:"name" json:"name"`
-	Subject     string   `conform:"trim,title" json:"subject"`
-	Description string   `conform:"trim" json:"description"`
-	Type        string   `conform:"trim" json:"ticket_type"`
-	Status      status   `json:"status"`
-	Priority    priority `json:"priority"`
-	Source      source   `json:"source"`
 }
