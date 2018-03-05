@@ -101,7 +101,7 @@ func NewClient(domain, api string) (*Client, error) {
 
 // CreateTicket creates a new ticket.
 func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
-	var ret *Ticket
+	var ret Ticket
 
 	b, err := json.Marshal(&ticket)
 	if err != nil {
@@ -133,8 +133,9 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 	}
 
 	// Grab the JSON response
-	if err = json.NewDecoder(res.Body).Decode(ret); err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&ret); err != nil {
 		return nil, err
 	}
-	return ret, nil
+
+	return &ret, nil
 }
