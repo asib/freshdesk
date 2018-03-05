@@ -3,8 +3,8 @@ package freshdesk
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -123,8 +123,13 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 
 	defer res.Body.Close()
 	// Check the status
-	if res.StatusCode != 200 {
-		return nil, errors.New("Freshdesk server didn't like the request")
+	if res.StatusCode >= 400 {
+		bs, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, fmt.Errorf("freshdesk server didn't like the request (status code: %d): %s", res.StatusCode, bs)
 	}
 
 	// Grab the JSON response
