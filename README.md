@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/leebenson/conform"
+	"github.com/smallpdf/conform"
 )
 
 func main() {
