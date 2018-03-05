@@ -8,15 +8,11 @@ import (
 	"net/http"
 )
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  TYPES, CONSTANTS
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-type source int
-type status int
-type priority int
+type (
+	source   int
+	status   int
+	priority int
+)
 
 const (
 	// Email ...
@@ -57,49 +53,54 @@ const (
 	Urgent
 )
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  REQUEST
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Request object for API request
-type Request struct {
+// Client is a freshdesk client that allows access to the freshdesk
+// API. It is save to use the client from different goroutines.
+type Client struct {
 	Domain string
 	API    string
+
+	httpClient *http.Client
 }
 
-// Do ...
-func (r *Request) Do(path string, in, out interface{}) error {
-	// Create client
-	client := &http.Client{}
-	// Turn the struct into JSON bytes
-	b, _ := json.Marshal(&in)
-	// Post JSON request to FreshDesk
-	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s.freshdesk.com%s", r.Domain, path), bytes.NewReader(b))
-	req.SetBasicAuth(r.API, "")
-	req.Header.Add("Content-type", "application/json")
-	res, e := client.Do(req)
-	if e != nil {
-		return e
+// NewClient returns a new freshdesk client.
+func NewClient(domain, api string) (*Client, error) {
+	return &Client{Domain: domain, API: api, httpClient: http.DefaultClient}, nil
+}
+
+// CreateTicket creates a new ticket.
+func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
+	var ret *Ticket
+
+	b, err := json.Marshal(&ticket)
+	if err != nil {
+		return nil, err
 	}
+
+	// Post JSON request to FreshDesk
+	req, err := http.NewRequest("POST", fmt.Sprintf("https://%s.freshdesk.com/api/v2/tickets", c.Domain), bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(c.API, "")
+	req.Header.Add("Content-type", "application/json")
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
 	defer res.Body.Close()
 	// Check the status
 	if res.StatusCode != 200 {
-		return errors.New("Freshdesk server didn't like the request")
+		return nil, errors.New("Freshdesk server didn't like the request")
 	}
-	// Grab the JSON response
-	if e = json.NewDecoder(res.Body).Decode(out); e != nil {
-		return e
-	}
-	return nil
-}
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  TICKETS
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Grab the JSON response
+	if err = json.NewDecoder(res.Body).Decode(ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
 
 // Ticket represents a single helpdesk ticket
 type Ticket struct {
@@ -111,30 +112,4 @@ type Ticket struct {
 	Status      status   `json:"status"`
 	Priority    priority `json:"priority"`
 	Source      source   `json:"source"`
-}
-
-// NewTicket represents helpdesk ticket request
-type NewTicket struct {
-	Ticket *Ticket `json:"helpdesk_ticket"`
-	CC     string  `conform:"trim" json:"cc_emails"`
-}
-
-type createTicketFields struct {
-	ID int `json:"id"`
-}
-
-type createTicketResponse struct {
-	Helpdesk *createTicketFields `json:"helpdesk_ticket"`
-}
-
-// Create posts a new ticket to FreshDesk
-func (h *NewTicket) Create(r *Request) error {
-	out := new(createTicketResponse)
-	if e := r.Do("/helpdesk/tickets.json", h, out); e != nil {
-		return e
-	}
-	if out.Helpdesk.ID == 0 {
-		return errors.New("Freshdesk didn't return valid ticket ID")
-	}
-	return nil
 }
