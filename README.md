@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	client, err := NewClient("your-domain", "your-api-key")
+	client, err := freshdesk.NewClient("your-domain", "your-api-key")
 	if err != nil {
 		fmt.Printf("Could not create client: %s\n", err)
 		os.Exit(1)
@@ -25,7 +25,7 @@ func main() {
 		Email:       "email@example.com",
 		Name:        "your name",
 		Subject:     "this is a test",
-		Type:        "Question",
+		Type:        freshdesk.Question,
 		Description: "the content of the ticket would go here",
 		Status:      freshdesk.Open,
 		Priority:    freshdesk.Medium,
