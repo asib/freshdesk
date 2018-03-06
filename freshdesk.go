@@ -71,6 +71,12 @@ const (
 	Lead = "Lead"
 )
 
+// API corresponds to the FreshdeskAPI. It can be used for mock
+// implementations for testing.
+type API interface {
+	CreateTicket(ticket *Ticket) (*Ticket, error)
+}
+
 // Client is a freshdesk client that allows access to the freshdesk
 // API. It is save to use the client from different goroutines.
 type Client struct {
