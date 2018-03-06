@@ -96,9 +96,9 @@ type Ticket struct {
 
 	Tags         []string          `json:"tags,omitempty"`
 	CustomFields map[string]string `json:"custom_fields,omitempty"`
-	Status       Status            `json:"status"`
-	Priority     Priority          `json:"priority"`
-	Source       Source            `json:"source"`
+	Status       Status            `json:"status,omitempty"`
+	Priority     Priority          `json:"priority,omitempty"`
+	Source       Source            `json:"source,omitempty"`
 }
 
 // NewClient returns a new freshdesk client that uses the
