@@ -88,10 +88,11 @@ type Ticket struct {
 	Description string     `conform:"trim" json:"description"`
 	Type        TicketType `conform:"trim" json:"type"`
 
-	Tags     []string `json:"tags,omitempty"`
-	Status   Status   `json:"status"`
-	Priority Priority `json:"priority"`
-	Source   Source   `json:"source"`
+	Tags         []string          `json:"tags,omitempty"`
+	CustomFields map[string]string `json:"custom_fields,omitempty"`
+	Status       Status            `json:"status"`
+	Priority     Priority          `json:"priority"`
+	Source       Source            `json:"source"`
 }
 
 // NewClient returns a new freshdesk client.
