@@ -80,8 +80,8 @@ type API interface {
 // Client is a freshdesk client that allows access to the freshdesk
 // API. It is save to use the client from different goroutines.
 type Client struct {
-	Domain string
-	API    string
+	Subdomain string
+	API       string
 
 	httpClient *http.Client
 }
@@ -103,8 +103,8 @@ type Ticket struct {
 
 // NewClient returns a new freshdesk client that uses the
 // http.DefaultClient under the hood.
-func NewClient(domain, api string) (*Client, error) {
-	return &Client{Domain: domain, API: api, httpClient: http.DefaultClient}, nil
+func NewClient(subdomain, api string) (*Client, error) {
+	return &Client{Subdomain: subdomain, API: api, httpClient: http.DefaultClient}, nil
 }
 
 // CreateTicket creates a new ticket.
@@ -116,7 +116,7 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("https://%s.freshdesk.com/api/v2/tickets", c.Domain), bytes.NewReader(b))
+	req, err := http.NewRequest("POST", fmt.Sprintf("https://%s.freshdesk.com/api/v2/tickets", c.Subdomain), bytes.NewReader(b))
 	if err != nil {
 		return nil, err
 	}
