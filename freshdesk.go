@@ -95,7 +95,8 @@ type Ticket struct {
 	Source       Source            `json:"source"`
 }
 
-// NewClient returns a new freshdesk client.
+// NewClient returns a new freshdesk client that uses the
+// http.DefaultClient under the hood.
 func NewClient(domain, api string) (*Client, error) {
 	return &Client{Domain: domain, API: api, httpClient: http.DefaultClient}, nil
 }
@@ -109,7 +110,6 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 		return nil, err
 	}
 
-	// Post JSON request to FreshDesk
 	req, err := http.NewRequest("POST", fmt.Sprintf("https://%s.freshdesk.com/api/v2/tickets", c.Domain), bytes.NewReader(b))
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 	}
 
 	defer res.Body.Close()
-	// Check the status
+
 	if res.StatusCode >= 400 {
 		bs, err := ioutil.ReadAll(res.Body)
 		if err != nil {
@@ -133,7 +133,6 @@ func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
 		return nil, fmt.Errorf("freshdesk server didn't like the request (status code: %d): %s", res.StatusCode, bs)
 	}
 
-	// Grab the JSON response
 	if err = json.NewDecoder(res.Body).Decode(&ret); err != nil {
 		return nil, err
 	}
