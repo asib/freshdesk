@@ -19,9 +19,10 @@ func TestTicket(t *testing.T) {
 		Name:        "Cool Testuser",
 		Subject:     "this is a test feature request",
 		Type:        FeatureRequest,
-		Description: "the content of the ticket would go here",
+		Description: "the (HTML) content of the ticket would go here",
 		Status:      Open,
-		Priority:    Medium,
+		Priority:    Low,
+		Tags:        []string{"test"},
 		Source:      Portal,
 	}
 
