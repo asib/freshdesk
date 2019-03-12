@@ -74,7 +74,7 @@ const (
 // API corresponds to the FreshdeskAPI. It can be used for mock
 // implementations for testing.
 type API interface {
-	CreateTicket(ticket *Ticket) (*Ticket, error)
+	CreateTicket(ticket *NewTicket) (*TicketResponse, error)
 }
 
 // Client is a freshdesk client that allows access to the freshdesk
@@ -87,7 +87,7 @@ type Client struct {
 }
 
 // Ticket represents a single helpdesk ticket
-type Ticket struct {
+type NewTicket struct {
 	Email       string     `conform:"email" json:"email"`
 	Name        string     `conform:"name" json:"name"`
 	Subject     string     `conform:"trim,title" json:"subject"`
@@ -101,6 +101,11 @@ type Ticket struct {
 	Source       Source            `json:"source,omitempty"`
 }
 
+type TicketResponse struct {
+	NewTicket
+	ID int `json:"id"`
+}
+
 // NewClient returns a new freshdesk client that uses the
 // http.DefaultClient under the hood.
 func NewClient(subdomain, api string) (*Client, error) {
@@ -108,8 +113,8 @@ func NewClient(subdomain, api string) (*Client, error) {
 }
 
 // CreateTicket creates a new ticket.
-func (c *Client) CreateTicket(ticket *Ticket) (*Ticket, error) {
-	var ret Ticket
+func (c *Client) CreateTicket(ticket *NewTicket) (*TicketResponse, error) {
+	var ret TicketResponse
 
 	b, err := json.Marshal(&ticket)
 	if err != nil {
